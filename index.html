@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f7b52">
 <title>Leading University — Assignment Cover Page Maker</title>
 <style>
 /* ============================================================
@@ -22,42 +23,51 @@
   --radius:10px;
 }
 *{box-sizing:border-box}
-html,body{height:100%}
+html{height:100%}
+/* a flex column shell means the topbar can wrap to two lines on a narrow
+   phone without every height below it needing a calc() that guesses at it */
 body{
-  margin:0;
+  margin:0;height:100vh;display:flex;flex-direction:column;
   font-family:"Segoe UI",Roboto,-apple-system,"Helvetica Neue",Arial,sans-serif;
   background:var(--bg);
   color:var(--ink);
   font-size:14px;
+  -webkit-text-size-adjust:100%;
 }
+@supports (height:100dvh){ body{height:100dvh} }
+
 .topbar{
-  height:56px;display:flex;align-items:center;gap:12px;
+  flex:none;min-height:56px;display:flex;align-items:center;gap:12px;
   padding:0 18px;background:#fff;border-bottom:1px solid var(--line);
-  position:sticky;top:0;z-index:60;
+  z-index:60;
 }
 .topbar .brand{display:flex;align-items:center;gap:10px;font-weight:650;letter-spacing:.2px}
-.topbar .brand img{width:28px;height:28px;object-fit:contain}
+.topbar .brand img{width:28px;height:28px;object-fit:contain;flex:none}
 .topbar .brand small{display:block;font-weight:400;font-size:11px;color:var(--muted);letter-spacing:.3px}
 .topbar .spacer{flex:1}
 
 .btn{
   appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);
   padding:8px 14px;border-radius:8px;font:inherit;font-weight:550;cursor:pointer;
+  white-space:nowrap;
   transition:background .12s,border-color .12s,transform .06s;
 }
 .btn:hover{background:#f6f8fa}
 .btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.55;cursor:progress}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
 .btn.primary:hover{background:var(--accent-dark);border-color:var(--accent-dark)}
+.btn.primary:disabled{background:var(--accent)}
 .btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
 .btn.ghost:hover{background:#f0f2f5;color:var(--ink)}
 
-.app{display:grid;grid-template-columns:390px 1fr;height:calc(100vh - 56px)}
+.app{flex:1;min-height:0;display:grid;grid-template-columns:390px 1fr}
 
 /* ---- sidebar / form ---- */
 .sidebar{
-  overflow-y:auto;background:var(--card);border-right:1px solid var(--line);
-  padding:18px 18px 60px;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  background:var(--card);border-right:1px solid var(--line);
+  padding:18px 18px 40px;
 }
 .group{margin-bottom:22px}
 .group > h3{
@@ -73,21 +83,23 @@ body{
 .field select,
 .field textarea{
   width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;
-  font:inherit;font-size:13.5px;background:#fcfcfd;color:var(--ink);outline:none;
+  font:inherit;font-size:16px;background:#fcfcfd;color:var(--ink);outline:none;
   transition:border-color .12s, box-shadow .12s, background .12s;
+}
+@media (min-width:901px){
+  .field input[type=text],.field input[type=date],.field select{font-size:13.5px}
 }
 .field input:focus,.field select:focus{
   border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(15,123,82,.13);
 }
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.row3{display:grid;grid-template-columns:1.4fr 1fr;gap:11px}
 .hintline{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.45}
 
 /* segmented type switch */
 .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:#f1f3f6;padding:4px;border-radius:9px}
 .seg button{
   appearance:none;border:0;background:transparent;font:inherit;font-size:12.5px;font-weight:600;
-  color:var(--muted);padding:7px 4px;border-radius:6px;cursor:pointer;transition:background .12s,color .12s;
+  color:var(--muted);padding:9px 4px;border-radius:6px;cursor:pointer;transition:background .12s,color .12s;
 }
 .seg button:hover{color:var(--ink)}
 .seg button.on{background:#fff;color:var(--accent);box-shadow:0 1px 3px rgba(16,24,40,.12)}
@@ -103,13 +115,14 @@ body{
 .combo{position:relative}
 .combo input{cursor:text}
 .combo .cb-arrow{
-  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  position:absolute;right:10px;top:calc(50% + 9px);transform:translateY(-50%);
   pointer-events:none;color:var(--muted);font-size:10px;
 }
 .combo .cb-list{
   position:absolute;z-index:40;left:0;right:0;top:calc(100% + 4px);
   background:#fff;border:1px solid var(--line);border-radius:9px;
   box-shadow:0 10px 30px rgba(16,24,40,.14);max-height:250px;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
   display:none;padding:4px;
 }
 .combo.open .cb-list{display:block}
@@ -121,14 +134,52 @@ body{
 .combo .cb-opt mark{background:#ffe9a8;color:inherit;padding:0 1px;border-radius:2px}
 .combo .cb-empty{padding:10px;color:var(--muted);font-size:12.5px;text-align:center}
 
+/* ---- credit ---- */
+.credit{
+  margin-top:26px;padding-top:14px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--muted);text-align:center;line-height:1.6;
+}
+.credit strong{color:var(--ink);font-weight:650}
+
 /* ---- preview stage ---- */
 .stage{
-  overflow:auto;padding:26px;display:flex;justify-content:center;align-items:flex-start;
+  overflow:auto;-webkit-overflow-scrolling:touch;
+  padding:26px;display:flex;justify-content:center;align-items:flex-start;
   background:
     radial-gradient(circle at 20% 0%,#f7f9fc 0%,transparent 55%),
     var(--bg);
 }
 .scaler{transform-origin:top center;transition:transform .12s ease}
+
+/* ---- mobile: one pane at a time, switched from a bottom tab bar ---- */
+.tabbar{display:none}
+@media screen and (max-width:900px){
+  .topbar{flex-wrap:wrap;padding:8px 12px;gap:8px}
+  .topbar .brand small{display:none}
+  .topbar .brand{font-size:14px}
+  .topbar .spacer{flex-basis:100%;height:0}
+  .btn{padding:8px 12px;font-size:13px;flex:1}
+  #btnFit{display:none}
+
+  .app{grid-template-columns:1fr}
+  .app[data-view=form]    .stage  {display:none}
+  .app[data-view=preview] .sidebar{display:none}
+
+  .sidebar{border-right:0;padding:16px 14px 92px}
+  .stage{padding:14px 8px 92px;align-items:flex-start}
+
+  .tabbar{
+    display:grid;grid-template-columns:1fr 1fr;gap:6px;
+    position:fixed;left:0;right:0;bottom:0;z-index:70;
+    background:#fff;border-top:1px solid var(--line);
+    padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+  }
+  .tabbar button{
+    appearance:none;border:1px solid var(--line);background:#fff;color:var(--muted);
+    font:inherit;font-weight:600;font-size:13.5px;padding:11px 4px;border-radius:9px;cursor:pointer;
+  }
+  .tabbar button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+}
 
 /* ============================================================
    2. THE COVER PAGE  —  A4, 595.44pt x 841.92pt
@@ -207,8 +258,8 @@ body{
    ============================================================ */
 @page{size:A4;margin:0}
 @media print{
-  html,body{background:#fff;height:auto}
-  .topbar,.sidebar,.stage-hint{display:none!important}
+  html,body{background:#fff;height:auto;display:block}
+  .topbar,.sidebar,.stage-hint,.tabbar{display:none!important}
   .app{display:block;height:auto}
   .stage{padding:0;overflow:visible;display:block;background:#fff}
   .scaler{transform:none!important;height:auto!important;transition:none!important}
@@ -218,6 +269,7 @@ body{
   position:fixed;bottom:14px;right:18px;background:rgba(31,35,40,.86);color:#fff;
   padding:7px 12px;border-radius:20px;font-size:11.5px;z-index:50;pointer-events:none;
 }
+@media screen and (max-width:900px){ .stage-hint{display:none} }
 </style>
 </head>
 <body>
@@ -232,10 +284,11 @@ body{
   <div class="spacer"></div>
   <button class="btn ghost" id="btnReset" title="Clear every field">Reset</button>
   <button class="btn" id="btnFit">Fit to screen</button>
-  <button class="btn primary" id="btnPrint">Print / Save as PDF</button>
+  <button class="btn" id="btnPrint">Print</button>
+  <button class="btn primary" id="btnDownload">Download PDF</button>
 </div>
 
-<div class="app">
+<div class="app" id="app" data-view="form">
   <!-- =============== FORM =============== -->
   <aside class="sidebar">
 
@@ -249,6 +302,17 @@ body{
         <label for="sId">Student ID</label>
         <input type="text" id="sId" placeholder="e.g. 0000000000000000" autocomplete="off">
       </div>
+      <div class="row2">
+        <div class="field">
+          <label for="sSection">Section</label>
+          <input type="text" id="sSection" placeholder="e.g. A" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="sBatch">Batch</label>
+          <input type="text" id="sBatch" placeholder="e.g. 50" autocomplete="off">
+        </div>
+      </div>
+      <p class="hintline">Leave section or batch empty and that whole line disappears from the cover.</p>
       <div class="field combo" id="sDeptCombo">
         <label for="sDept">Department</label>
         <input type="text" id="sDept" placeholder="Search department…" autocomplete="off" role="combobox" aria-expanded="false">
@@ -288,9 +352,11 @@ body{
 
     <div class="group">
       <h3>Submitted to</h3>
-      <div class="field">
+      <div class="field combo" id="tNameCombo">
         <label for="tName">Teacher’s name</label>
-        <input type="text" id="tName" placeholder="e.g. Karim Hossain" autocomplete="off">
+        <input type="text" id="tName" placeholder="Start typing a teacher’s name…" autocomplete="off" role="combobox" aria-expanded="false">
+        <span class="cb-arrow">▼</span>
+        <div class="cb-list"></div>
       </div>
       <div class="field combo" id="tDesigCombo">
         <label for="tDesig">Designation</label>
@@ -304,8 +370,15 @@ body{
         <span class="cb-arrow">▼</span>
         <div class="cb-list"></div>
       </div>
-      <p class="hintline">Both lists come from the official department list on lus.ac.bd. You can also type anything of your own.</p>
+      <p class="hintline">Teachers, designations and departments come from the faculty pages on
+        lus.ac.bd. Picking a teacher fills in the other two for you — and you can always type
+        something of your own instead.</p>
     </div>
+
+    <footer class="credit">
+      Developed by <strong>Hasan Al Mahdi</strong><br>
+      Made for the students of Leading University, Sylhet
+    </footer>
 
   </aside>
 
@@ -345,8 +418,8 @@ body{
               <td>
                 <div class="r"><span class="k">Name</span><span class="c">:</span><span class="v" id="cpName"></span></div>
                 <div class="r"><span class="k">ID</span><span class="c">:</span><span class="v" id="cpId"></span></div>
-                <div class="r"><span class="k">Section</span><span class="c">:</span><span class="v" id="cpSection">C</span></div>
-                <div class="r"><span class="k">Batch</span><span class="c">:</span><span class="v" id="cpBatch">66</span></div>
+                <div class="r" id="rowSection"><span class="k">Section</span><span class="c">:</span><span class="v" id="cpSection"></span></div>
+                <div class="r" id="rowBatch"><span class="k">Batch</span><span class="c">:</span><span class="v" id="cpBatch"></span></div>
                 <div id="cpSDept"></div>
                 <div>Leading University</div>
               </td>
@@ -365,6 +438,11 @@ body{
     </div>
   </main>
 </div>
+
+<nav class="tabbar" id="tabbar">
+  <button type="button" data-view="form" class="on">Fill the form</button>
+  <button type="button" data-view="preview">Preview</button>
+</nav>
 
 <div class="stage-hint" id="stageHint"></div>
 
@@ -408,13 +486,16 @@ var DESIGNATIONS = [
   {name:"Adjunct Lecturer",                  hint:"most common at LU"},
   {name:"Senior Lecturer"},
   {name:"Assistant Professor"},
+  {name:"Assistant Professor & Head"},
+  {name:"Assistant Professor & Head (Acting)"},
   {name:"Associate Professor"},
+  {name:"Associate Professor & Head"},
   {name:"Professor"},
   {name:"Professor Dr."},
-  {name:"Assistant Professor & Head"},
-  {name:"Associate Professor & Head"},
   {name:"Professor & Head"},
   {name:"Professor & Dean"},
+  {name:"Professor & Director"},
+  {name:"Head"},
   {name:"Head of the Department"},
   {name:"Chairman"},
   {name:"Chairperson"},
@@ -437,13 +518,38 @@ var DESIGNATIONS = [
   {name:"Vice Chancellor"}
 ];
 
+/* ---- teacher directory, scraped from the faculty pages on lus.ac.bd ----
+   149 teachers across 10 departments. Bangla is absent because LU publishes
+   no faculty list for it. Packed as "name~designation~department" with the
+   two tails as indexes into the arrays above, which keeps this near 3 KB. */
+var T_DESIG = ["Adjunct Lecturer","Assistant Professor","Assistant Professor & Head (Acting)","Associate Professor","Associate Professor & Head","Dean","Head","Lecturer","Professor & Director","Professor & Head"];
+var T_DEPT  = ["Department of Architecture","Department of Business Administration","Department of Civil Engineering","Department of Computer Science and Engineering","Department of Electrical and Electronic Engineering","Department of English","Department of Islamic Studies","Department of Law","Department of Public Health","Department of Tourism and Hospitality Management"];
+var TEACHERS = "A R M Kamruzzaman~7~2|A. S. M. Sufian Pabel~7~1|Abdulla Al Mahmud Mugdo~7~3|Abdullah Al- Mamun~4~7|Abul Kalam Azad~7~6|Ali Omar~7~5|Alian Ahmed Ferdous~0~3|Ameya Debnath~7~3|Aminul Islam~7~7|Amit Chakraborty~2~2|Anam Ahmed~7~5|Anwar Ahmad Arif~3~1|Arpan Shil~7~0|Arpita Roy~0~3|Ashfakur Rahman~0~3|Ashfaque Ahmad Shovon~1~5|Ashika Rabbi Umi~7~5|Aushtmi Deb~7~3|Bipul Karmokar~0~3|Burhan Uddin~7~0|Chowdhury Tabassum Shakila~1~1|Danbir Rashid~0~3|Debojyoti Biswas~7~3|Dipayon Kumar Sikder~7~4|Dipta Chandra Paul~7~3|Dr. Aysa Yeasmin~1~1|Dr. Fazly Ealahi Mamun~3~6|Dr. M Ashraf Al Haq~1~1|Dr. Md. Abul Mozid Miah~9~8|Dr. Md. Rashidul Hasan~1~8|Dr. Md. Rezaul Karim~8~5|Dr. Md. Ziaur Rahman~4~6|Dr. Nazmun Nahar Papri~7~2|Dr. Sabrina Farida Chowdhury~7~8|Dr. Shabbir Ahmed Osmani~3~2|Dr. Shafkat Kibria~3~3|Emad Ahmed~7~2|Fahad Bin Mahbub~7~3|Fahmida Sultana~7~4|Faiza Mubarok~0~3|Fakrul Islam~7~1|Farhad Hossain~1~1|Farhana Hoque~7~0|Gulam Mahfuz Chowdhury~7~4|Iehit Sharma~1~9|Iffat Ara Helal Akhi~7~3|Ifrad Hasan Nafiu~7~7|Ishmam Ahmed Chowdhury~7~4|Jafor Ahmed Limon~1~2|Jakir Hasan~0~3|Jaynob Sarker~1~1|Juhora Jamin Juha~1~9|Kazi Md. Jahid Hasan~4~3|Kulsuma Khanum~7~4|Mahdy Hassan Siddiki~7~2|Mahfuja Al Hena~0~3|Maskat Jahan Jumu~0~3|Md Imtiaz Ahmad~7~0|Md. Abdul Muhith Chowdhury~1~1|Md. Abid Ashraf~0~3|Md. Amranul Haque~7~3|Md. Arifuzzaman~1~3|Md. Ashfaq Hussain~7~7|Md. Asraful Islam Chowdhury~1~9|Md. Ebrahim Hossain~3~3|Md. Golam Shahria Bhuyain~7~2|Md. Hafizur Rahman Khan~1~1|Md. Hasan Mahmud~7~7|Md. Jalal Uddin Chowdhury~7~3|Md. Jamaner Rahaman~1~3|Md. Jehadul Islam Mony~1~3|Md. Mahbubur Rahaman~3~9|Md. Mahdi Hossain Hira~0~3|Md. Mamunor Rashid~7~6|Md. Maraz Miah~7~7|Md. Mizanur Rahman~7~3|Md. Niaz Morshedul Haque~2~4|Md. Rajib Hossain~7~7|Md. Rezaul Karim~1~7|Md. Sadekur Rahman Roni~7~3|Md. Saidur Rahman Kohinoor~7~3|Md. Saiful Ambia Chowdhury~7~3|Md. Sajadul Islam Sarker~3~9|Md. Salauddin~7~4|Md. Shafayet Shahed Ornob~7~1|Md. Shamimul Islam~3~1|Md. Tanjimuddin~7~4|Mohammad Jaber Hossain~7~3|Mohammad Zahed Hossain~1~1|Moin Uddin Jilan~7~1|Mominul Islam~7~2|Monjila Moni~7~3|Mr. Fahim~7~7|Mrinal Kanti Dhar~1~4|Ms. Touhida Sultana~1~5|Muhammad Sakib Ibtidha Chowdhury~7~3|Muin Mustahasin Pritom~7~4|Musa. Halima Begum~3~8|Mushabbir Muttaki~7~0|Nabid Hasnat~7~2|Nadia Sultana Daijy~7~5|Naeem Ahsan Chowdhury~7~3|Nafis Subhani~1~4|Nahidul Islam Rupom~7~3|Naimul Islam~7~2|Nargish Jahan~0~3|Navid Newaz~7~4|Nilavro Das Kabya~7~3|Nuzhat Madeha Chowdhury~0~3|Omme Kulsum Mili~7~5|Prithwiraj Bhattacharjee~1~3|Professor Dr. Bashir Ahmed Bhuiyan~5~1|Professor Dr. Mohammad Shahansha Molla~6~1|Rafiqul Islam~1~4|Rezwana Afrin~7~3|Rumpa Sharmin~1~5|S. M. Ahoshan Habib Arnob~7~9|S. M. Tanbinul Hoque~7~4|Sabia Akter Bhuiyan~3~3|Sadia Jannat~0~3|Sajida Sultana Shammy~0~3|Salina Akther~1~0|Sayed Ahmed~1~0|Shabnaz Chowdhury~0~3|Shadia Sharmin~7~9|Shafinul Islam~7~2|Shah Mahdi Hasan~7~0|Shahriar Arefin Zummon~7~3|Shahriar Hossain Apu~7~3|Shahrin Iqbal~7~4|Shakib Bhuiyan~7~2|Shammi Akter~4~5|Somapika Das~7~3|Soumik Paul Jisun~7~3|Sourov Roy Shuvo~0~3|Sudipta Banik Trisha~0~3|Syed Mohsin Ali~4~0|Syeda Nazia Mahbuba~7~5|Taahia Tahsin~0~3|Tabassum Binty Rouf~7~5|Tahmina Khanom~1~1|Tanjila Jahan Khan~7~2|Tanjima Siddika Chandni~1~0|Tasfia Chowdhury Nujat~0~3|Thonmoy Chowdhury Suhel~7~4|Tonima Akther Pinki~0~3|Tonni Das Jui~7~3|Wahida Akther~3~1|Zawad Al Akram~0~3".split("|").map(function(s){
+  var p = s.split("~");
+  return {name:p[0], desig:T_DESIG[+p[1]], dept:T_DEPT[+p[2]]};
+});
+
+/* the combobox wants {name, hint} rows; the teacher's hint carries the two
+   fields that get auto-filled when the row is picked */
+var TEACHER_ITEMS = TEACHERS.map(function(t){
+  return {
+    name: t.name,
+    hint: t.desig + " · " + t.dept.replace(/^Department of /, ""),
+    t: t
+  };
+});
+
 /* The crest is baked straight into the <img> tags as a base64 PNG, so it shows
    even if JavaScript never runs. */
 
 /* ------------------------------------------------------------------
    Searchable dropdown (combobox)
+
+   onInput fires on every keystroke (so the preview tracks typing);
+   onChoose fires only when a row is actually picked, which is how the
+   teacher list fills in designation and department.
    ------------------------------------------------------------------ */
-function makeCombo(rootId, items, extraTerms, onPick){
+function makeCombo(rootId, items, extraTerms, onInput, onChoose){
   var root  = document.getElementById(rootId);
   var input = root.querySelector("input");
   var list  = root.querySelector(".cb-list");
@@ -488,13 +594,15 @@ function makeCombo(rootId, items, extraTerms, onPick){
 
   function pick(i){
     if(i < 0 || i >= shown.length) return;
-    input.value = shown[i].name;
+    var it = shown[i];
+    input.value = it.name;
     close();
-    if(onPick) onPick(input.value);
+    if(onChoose) onChoose(it);
+    if(onInput)  onInput(input.value);
   }
 
   input.addEventListener("focus", function(){ render(input.value); open(); });
-  input.addEventListener("input", function(){ active = -1; render(input.value); open(); if(onPick) onPick(input.value); });
+  input.addEventListener("input", function(){ active = -1; render(input.value); open(); if(onInput) onInput(input.value); });
   input.addEventListener("keydown", function(e){
     if(e.key === "ArrowDown" || e.key === "ArrowUp"){
       e.preventDefault();
@@ -541,12 +649,10 @@ function formatDate(v){
   return parseInt(p[2],10) + " " + (MONTHS[m] || "") + " " + p[0];
 }
 
-/* the two lines that never change */
-var FIXED = {uni:"Leading University"};
-
 /* per-type behaviour: label wording, how the heading reads, and the caption
-   printed in front of the name on the cover. The name is optional for every
-   type — only the number is required. */
+   printed in front of the name on the cover. An experiment is meaningless
+   without its title, so there the name is required; for the other two the
+   number alone is enough. */
 var TYPES = {
   "Assignment": {joiner:" - ",    noLabel:"Assignment number",  nameLabel:"Assignment name",
                  coverLabel:"Assignment Name",  nameRequired:false,
@@ -555,12 +661,20 @@ var TYPES = {
                  coverLabel:"Lab Report Name",  nameRequired:false,
                  namePh:"e.g. Verification of Ohm’s Law"},
   "Experiment": {joiner:" No - ", noLabel:"Experiment number",  nameLabel:"Experiment name",
-                 coverLabel:"Experiment Name",  nameRequired:false,
+                 coverLabel:"Experiment Name",  nameRequired:true,
                  namePh:"e.g. Determination of Young’s Modulus"}
 };
 
 function txt(el, value, fallback){
   el.textContent = (value && value.trim()) ? value.trim() : (fallback || "");
+}
+
+/* A blank section or batch should take its label with it, not leave a dangling
+   "Section :" on the printed cover. */
+function optionalRow(rowId, valueId, raw){
+  var v = (raw || "").trim();
+  $(rowId).style.display = v ? "" : "none";
+  $(valueId).textContent = v;
 }
 
 /* The cover line reads "Assignment Name: <what the student typed>" (likewise
@@ -614,6 +728,8 @@ function render(){
 
   txt($("cpName"),    $("sName").value, "");
   txt($("cpId"),      $("sId").value, "");
+  optionalRow("rowSection", "cpSection", $("sSection").value);
+  optionalRow("rowBatch",   "cpBatch",   $("sBatch").value);
   txt($("cpSDept"),   $("sDept").value, "");
 
   txt($("cpTName"),  $("tName").value, "");
@@ -627,8 +743,10 @@ function render(){
 }
 
 /* ---- persistence ---- */
-var FIELDS = ["sName","sId","sDept","wType","wNo","wName","wCourse","wDate","tName","tDesig","tDept"];
-var KEY = "lu-cover-page-v2";
+var FIELDS = ["sName","sId","sSection","sBatch","sDept",
+              "wType","wNo","wName","wCourse","wDate",
+              "tName","tDesig","tDept"];
+var KEY = "lu-cover-page-v3";
 
 function save(){
   try{
@@ -655,12 +773,419 @@ var PAGE_H = 841.92 * (96/72);
 
 function fit(){
   var stage = $("stage");
-  var pad = 52;
-  var s = Math.min((stage.clientWidth - pad) / PAGE_W, (stage.clientHeight - pad) / PAGE_H, 1.35);
-  s = Math.max(s, 0.25);
+  if(stage.clientWidth < 60) return;    /* pane is hidden on mobile — nothing to fit */
+  var narrow = window.matchMedia("(max-width:900px)").matches;
+  var pad = narrow ? 18 : 52;
+  var s = Math.min((stage.clientWidth - pad) / PAGE_W, 1.35);
+  /* on a phone the page is allowed to be taller than the pane and simply scrolls */
+  if(!narrow) s = Math.min(s, (stage.clientHeight - pad) / PAGE_H);
+  s = Math.max(s, 0.2);
   $("scaler").style.transform = "scale(" + s + ")";
   $("scaler").style.height = (PAGE_H * s) + "px";
   $("stageHint").textContent = "A4 · 210 × 297 mm · " + Math.round(s*100) + "%";
+}
+
+/* "both" is the desktop state — form and preview side by side, exactly as before.
+   The two single-pane states only mean anything under the mobile media query. */
+function setView(v){
+  $("app").dataset.view = v;
+  Array.prototype.forEach.call($("tabbar").children, function(b){
+    b.classList.toggle("on", b.dataset.view === v);
+  });
+  /* called straight away rather than through requestAnimationFrame, which a
+     browser will happily never fire while the tab is in the background */
+  if(v !== "form") fit();
+}
+
+/* crossing the breakpoint has to hand the layout over cleanly: a desktop window
+   dragged narrow would otherwise sit in "both" with neither tab lit */
+function syncView(){
+  var narrow = window.matchMedia("(max-width:900px)").matches;
+  var v = $("app").dataset.view;
+  if(narrow && v === "both")  setView("form");
+  else if(!narrow && v !== "both") setView("both");
+  else fit();
+}
+
+/* ==================================================================
+   DIRECT PDF DOWNLOAD
+
+   Writes a real single-page A4 PDF by hand — no library, no server,
+   nothing to install, so the whole app stays a static file that
+   Vercel can serve as-is.
+
+   Text is drawn with the PDF base-14 Times faces, which are metrically
+   identical to Times New Roman, so the result is true selectable vector
+   text rather than a screenshot. Every coordinate is measured from the
+   live preview, which means the PDF and what you see can never drift
+   apart.
+   ================================================================== */
+
+/* ---- byte buffer (latin-1 strings and raw arrays, mixed) ---- */
+function Bytes(){ this.parts = []; this.len = 0; }
+Bytes.prototype.push = function(x){
+  var b;
+  if(typeof x === "string"){
+    b = new Uint8Array(x.length);
+    for(var i=0;i<x.length;i++) b[i] = x.charCodeAt(i) & 0xff;
+  } else { b = x; }
+  this.parts.push(b);
+  this.len += b.length;
+  return this;
+};
+Bytes.prototype.done = function(){
+  var out = new Uint8Array(this.len), o = 0;
+  for(var i=0;i<this.parts.length;i++){ out.set(this.parts[i], o); o += this.parts[i].length; }
+  return out;
+};
+
+/* The base-14 fonts are WinAnsi-encoded, so the handful of typographic
+   characters a student might paste in need remapping; anything outside the
+   set degrades to "?" rather than corrupting the stream. */
+var WINANSI = {0x20AC:0x80,0x201A:0x82,0x0192:0x83,0x201E:0x84,0x2026:0x85,0x2020:0x86,
+               0x2021:0x87,0x02C6:0x88,0x2030:0x89,0x0160:0x8A,0x2039:0x8B,0x0152:0x8C,
+               0x2018:0x91,0x2019:0x92,0x201C:0x93,0x201D:0x94,0x2022:0x95,0x2013:0x96,
+               0x2014:0x97,0x02DC:0x98,0x2122:0x99,0x0161:0x9A,0x203A:0x9B,0x0153:0x9C,
+               0x0178:0x9F};
+function pdfStr(s){
+  var out = "(";
+  for(var i=0;i<s.length;i++){
+    var c = s.charCodeAt(i);
+    if(WINANSI[c] !== undefined) c = WINANSI[c];
+    else if(c > 255) c = 63;                       /* "?" */
+    if(c === 40 || c === 41 || c === 92) out += "\\";
+    out += String.fromCharCode(c);
+  }
+  return out + ")";
+}
+
+function num(n){ return (Math.round(n * 1000) / 1000).toString(); }
+
+function hexToRGB(h){
+  h = (h || "#000000").trim();
+  var m = /^#?([0-9a-f]{6})$/i.exec(h);
+  if(m){
+    var v = parseInt(m[1],16);
+    return [(v>>16&255)/255, (v>>8&255)/255, (v&255)/255];
+  }
+  var r = /rgba?\(([^)]+)\)/i.exec(h);
+  if(r){
+    var p = r[1].split(",").map(parseFloat);
+    return [(p[0]||0)/255, (p[1]||0)/255, (p[2]||0)/255];
+  }
+  return [0,0,0];
+}
+
+/* The decorative waves are already authored in PDF space (the <g> flips y),
+   and the viewBox is 1:1 with the page in points, so the path data transfers
+   across with nothing more than an operator rename. */
+function svgPathToPDF(d){
+  var t = d.trim().split(/[\s,]+/), out = [], i = 0;
+  while(i < t.length){
+    var c = t[i++];
+    if(c === "M" || c === "L"){
+      out.push(num(+t[i++]), num(+t[i++]), c === "M" ? "m" : "l");
+    } else if(c === "C"){
+      for(var k=0;k<6;k++) out.push(num(+t[i++]));
+      out.push("c");
+    } else if(c === "Z" || c === "z"){
+      out.push("h");
+    }
+  }
+  return out.join(" ");
+}
+
+/* zlib-wrapped deflate, which is exactly what /FlateDecode wants */
+function deflate(bytes){
+  if(typeof CompressionStream === "undefined") return Promise.resolve(null);
+  try{
+    var s = new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate"));
+    return new Response(s).arrayBuffer().then(function(b){ return new Uint8Array(b); },
+                                              function(){ return null; });
+  }catch(e){ return Promise.resolve(null); }
+}
+
+var _measure = document.createElement("canvas").getContext("2d");
+
+/* Chrome hands back the inline content box for a text range, whose height is
+   the font's ascent+descent. Deriving the baseline from the font metrics works
+   whether the rect is that box or the whole line box. */
+function baselineIn(rect, cssFont){
+  _measure.font = cssFont;
+  var m = _measure.measureText("Hxg");
+  var a = m.fontBoundingBoxAscent, d = m.fontBoundingBoxDescent;
+  if(!a || !d){                       /* very old engine — Times New Roman ratios */
+    var size = parseFloat(cssFont) || 16;
+    a = size * 0.891; d = size * 0.216;
+  }
+  return rect.top + (rect.height - (a + d)) / 2 + a;
+}
+
+/* Split a text node into runs of characters that share a line, measuring each
+   character so a wrapped teacher name or long title lands exactly where the
+   browser put it. Splitting more often than strictly necessary is harmless —
+   every run carries its own absolute position. */
+function runsOfTextNode(node){
+  var s = node.nodeValue, runs = [], cur = null;
+  var r = document.createRange();
+  for(var i=0;i<s.length;i++){
+    r.setStart(node, i); r.setEnd(node, i+1);
+    var rects = r.getClientRects();
+    if(!rects.length) continue;                       /* collapsed or not rendered */
+    var b = rects[0];
+    if(b.width === 0 && b.height === 0) continue;
+    if(cur && Math.abs(b.top - cur.top) < 0.5 && Math.abs(b.left - cur.right) < 1.2){
+      cur.text += s[i];
+      cur.right = b.right;
+    } else {
+      if(cur) runs.push(cur);
+      cur = {text:s[i], left:b.left, right:b.right, top:b.top, height:b.height};
+    }
+  }
+  if(cur) runs.push(cur);
+  return runs;
+}
+
+/* Everything that has to be read out of the DOM, gathered in one synchronous
+   pass so the page can be restored before we hit the first await. */
+function collectPlan(){
+  var page = $("page");
+  var pr = page.getBoundingClientRect();
+  var f = (72/96) * (PAGE_W / pr.width);      /* screen px -> page pt, zoom included */
+  var H = 841.92;
+  function X(px){ return (px - pr.left) * f; }
+  function Y(py){ return H - (py - pr.top) * f; }
+
+  var plan = {shapes:[], texts:[], lines:[], image:null};
+
+  page.querySelectorAll(".deco path").forEach(function(p){
+    plan.shapes.push({rgb:hexToRGB(p.getAttribute("fill")), d:svgPathToPDF(p.getAttribute("d"))});
+  });
+
+  var logo = $("cpLogo");
+  if(logo.complete && logo.naturalWidth){
+    var lr = logo.getBoundingClientRect();
+    /* object-fit:contain insets the bitmap inside its box */
+    var k  = Math.min(lr.width / logo.naturalWidth, lr.height / logo.naturalHeight);
+    var dw = logo.naturalWidth * k, dh = logo.naturalHeight * k;
+    var dx = lr.left + (lr.width - dw) / 2, dy = lr.top + (lr.height - dh) / 2;
+
+    var cv = document.createElement("canvas");
+    cv.width = logo.naturalWidth; cv.height = logo.naturalHeight;
+    var cx = cv.getContext("2d");
+    cx.drawImage(logo, 0, 0);
+    var px = cx.getImageData(0, 0, cv.width, cv.height).data;
+    var n = cv.width * cv.height;
+    var rgb = new Uint8Array(n*3), alpha = new Uint8Array(n), opaque = true;
+    for(var i=0,j=0;i<n;i++){
+      rgb[j++] = px[i*4]; rgb[j++] = px[i*4+1]; rgb[j++] = px[i*4+2];
+      alpha[i] = px[i*4+3];
+      if(alpha[i] !== 255) opaque = false;
+    }
+    plan.image = {w:cv.width, h:cv.height, rgb:rgb, alpha:opaque ? null : alpha,
+                  x:X(dx), y:Y(dy + dh), dw:dw * f, dh:dh * f};
+  }
+
+  /* table rules: stroking each cell box covers every edge, and the collapsed
+     borders shared by neighbours simply land on top of each other */
+  page.querySelectorAll(".cp-table th, .cp-table td").forEach(function(cell){
+    var b = cell.getBoundingClientRect();
+    var cs = getComputedStyle(cell);
+    plan.lines.push({
+      x:X(b.left), y:Y(b.bottom), w:b.width * f, h:b.height * f,
+      lw:Math.max(parseFloat(cs.borderTopWidth) * f, 0.2),
+      rgb:hexToRGB(cs.borderTopColor)
+    });
+  });
+
+  var walker = document.createTreeWalker(page, NodeFilter.SHOW_TEXT, {
+    acceptNode: function(n){
+      if(!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      if(!n.parentElement || n.parentElement.closest("svg")) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  for(var node; (node = walker.nextNode()); ){
+    var el = node.parentElement;
+    var cs = getComputedStyle(el);
+    if(cs.visibility === "hidden" || +cs.opacity === 0) continue;
+    var size = parseFloat(cs.fontSize);
+    var bold = cs.fontWeight === "bold" || parseInt(cs.fontWeight, 10) >= 600;
+    var ital = cs.fontStyle === "italic" || cs.fontStyle === "oblique";
+    var face = bold ? (ital ? "F4" : "F2") : (ital ? "F3" : "F1");
+    var cssFont = (ital ? "italic " : "") + (bold ? "bold " : "") + size + "px " + cs.fontFamily;
+    var rgbc = hexToRGB(cs.color);
+    runsOfTextNode(node).forEach(function(run){
+      plan.texts.push({
+        text: run.text, face: face, size: size * f,
+        x: X(run.left), y: Y(baselineIn(run, cssFont)), rgb: rgbc
+      });
+    });
+  }
+  return plan;
+}
+
+/* Measure with the preview un-zoomed and both panes laid out, then put
+   everything back. It all happens inside one task, so nothing is painted. */
+function withMeasurablePage(fn){
+  var app = $("app"), scaler = $("scaler");
+  var view = app.dataset.view, tr = scaler.style.transform;
+  var ht = scaler.style.height, ts = scaler.style.transition;
+  app.dataset.view = "both";
+  scaler.style.transition = "none";
+  scaler.style.transform = "scale(1)";
+  scaler.style.height = "";
+  void $("page").offsetWidth;                         /* force layout */
+  try{ return fn(); }
+  finally{
+    app.dataset.view = view;
+    scaler.style.transform = tr;
+    scaler.style.height = ht;
+    scaler.style.transition = ts;
+    void $("page").offsetWidth;
+  }
+}
+
+function buildPDF(plan){
+  var objs = [];
+  function obj(chunks){ objs.push(chunks); return objs.length; }
+  function streamObj(dict, data){
+    return obj(["<<" + dict + "/Length " + data.length + ">>\nstream\n", data, "\nendstream"]);
+  }
+
+  var jobs = [];
+  var imgId = 0, smaskId = 0;
+
+  if(plan.image){
+    jobs.push(deflate(plan.image.rgb).then(function(z){
+      var d = z || plan.image.rgb;
+      imgId = streamObj(
+        "/Type/XObject/Subtype/Image/Width " + plan.image.w + "/Height " + plan.image.h +
+        "/ColorSpace/DeviceRGB/BitsPerComponent 8" + (z ? "/Filter/FlateDecode" : "") +
+        (plan.image.alpha ? "/SMask " + (objs.length + 2) + " 0 R" : ""),
+        d);
+    }));
+  }
+
+  return Promise.all(jobs).then(function(){
+    /* the SMask must be the object right after the image for the forward
+       reference above to be right */
+    if(plan.image && plan.image.alpha){
+      return deflate(plan.image.alpha).then(function(z){
+        var d = z || plan.image.alpha;
+        smaskId = streamObj(
+          "/Type/XObject/Subtype/Image/Width " + plan.image.w + "/Height " + plan.image.h +
+          "/ColorSpace/DeviceGray/BitsPerComponent 8" + (z ? "/Filter/FlateDecode" : ""),
+          d);
+      });
+    }
+  }).then(function(){
+    var ops = [];
+    ops.push("q 0 0 595.44 841.92 re W n");           /* clip to the page */
+
+    plan.shapes.forEach(function(s){
+      ops.push(num(s.rgb[0]) + " " + num(s.rgb[1]) + " " + num(s.rgb[2]) + " rg");
+      ops.push(s.d + " f");
+    });
+
+    if(plan.image && imgId){
+      ops.push("q " + num(plan.image.dw) + " 0 0 " + num(plan.image.dh) + " " +
+               num(plan.image.x) + " " + num(plan.image.y) + " cm /Im0 Do Q");
+    }
+
+    var lastLW = null, lastLC = null;
+    plan.lines.forEach(function(l){
+      if(l.lw !== lastLW){ ops.push(num(l.lw) + " w"); lastLW = l.lw; }
+      var c = num(l.rgb[0]) + " " + num(l.rgb[1]) + " " + num(l.rgb[2]) + " RG";
+      if(c !== lastLC){ ops.push(c); lastLC = c; }
+      ops.push(num(l.x) + " " + num(l.y) + " " + num(l.w) + " " + num(l.h) + " re S");
+    });
+
+    ops.push("BT");
+    var lastFont = null, lastFill = null;
+    plan.texts.forEach(function(t){
+      var fo = "/" + t.face + " " + num(t.size) + " Tf";
+      if(fo !== lastFont){ ops.push(fo); lastFont = fo; }
+      var c = num(t.rgb[0]) + " " + num(t.rgb[1]) + " " + num(t.rgb[2]) + " rg";
+      if(c !== lastFill){ ops.push(c); lastFill = c; }
+      ops.push("1 0 0 1 " + num(t.x) + " " + num(t.y) + " Tm");
+      ops.push(pdfStr(t.text) + " Tj");
+    });
+    ops.push("ET");
+    ops.push("Q");
+
+    var content = streamObj("", ops.join("\n"));
+
+    var f1 = obj(["<</Type/Font/Subtype/Type1/BaseFont/Times-Roman/Encoding/WinAnsiEncoding>>"]);
+    var f2 = obj(["<</Type/Font/Subtype/Type1/BaseFont/Times-Bold/Encoding/WinAnsiEncoding>>"]);
+    var f3 = obj(["<</Type/Font/Subtype/Type1/BaseFont/Times-Italic/Encoding/WinAnsiEncoding>>"]);
+    var f4 = obj(["<</Type/Font/Subtype/Type1/BaseFont/Times-BoldItalic/Encoding/WinAnsiEncoding>>"]);
+
+    var res = "<</Font<</F1 " + f1 + " 0 R/F2 " + f2 + " 0 R/F3 " + f3 + " 0 R/F4 " + f4 + " 0 R>>" +
+              (imgId ? "/XObject<</Im0 " + imgId + " 0 R>>" : "") + ">>";
+
+    var pagesId = objs.length + 2;                    /* page is next, pages after it */
+    var pageId = obj(["<</Type/Page/Parent " + pagesId + " 0 R/MediaBox[0 0 595.44 841.92]" +
+                      "/Resources " + res + "/Contents " + content + " 0 R>>"]);
+    obj(["<</Type/Pages/Kids[" + pageId + " 0 R]/Count 1>>"]);
+    var rootId = obj(["<</Type/Catalog/Pages " + pagesId + " 0 R>>"]);
+    var infoId = obj(["<</Title " + pdfStr("Assignment cover page") +
+                      "/Producer " + pdfStr("LU Cover Page Maker — developed by Hasan Al Mahdi") +
+                      "/Creator " + pdfStr("LU Cover Page Maker") + ">>"]);
+
+    var out = new Bytes();
+    out.push("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n");
+    var offsets = [];
+    for(var i=0;i<objs.length;i++){
+      offsets.push(out.len);
+      out.push((i+1) + " 0 obj\n");
+      objs[i].forEach(function(p){ out.push(p); });
+      out.push("\nendobj\n");
+    }
+    var xref = out.len;
+    var tail = "xref\n0 " + (objs.length+1) + "\n0000000000 65535 f \n";
+    offsets.forEach(function(o){ tail += ("0000000000" + o).slice(-10) + " 00000 n \n"; });
+    tail += "trailer\n<</Size " + (objs.length+1) + "/Root " + rootId +
+            " 0 R/Info " + infoId + " 0 R>>\nstartxref\n" + xref + "\n%%EOF\n";
+    out.push(tail);
+    return out.done();
+  });
+}
+
+function pdfFilename(){
+  function safe(s){ return (s || "").trim().replace(/[^\w.-]+/g, "-").replace(/^-+|-+$/g, ""); }
+  var parts = [safe($("wType").value)];
+  var no = safe($("wNo").value);   if(no) parts.push(no);
+  var id = safe($("sId").value);   if(id) parts.push(id);
+  return parts.filter(Boolean).join("-") + ".pdf";
+}
+
+function downloadPDF(){
+  var btn = $("btnDownload");
+  if(btn.disabled) return;
+  var label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Preparing…";
+
+  var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+  ready.then(function(){
+    return buildPDF(withMeasurablePage(collectPlan));
+  }).then(function(bytes){
+    var url = URL.createObjectURL(new Blob([bytes], {type:"application/pdf"}));
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = pdfFilename();
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 30000);
+  }).catch(function(err){
+    console.error(err);
+    alert("Could not build the PDF here. Use the Print button and choose “Save as PDF” instead.");
+  }).then(function(){
+    btn.disabled = false;
+    btn.textContent = label;
+  });
 }
 
 /* ---- init ---- */
@@ -671,19 +1196,17 @@ function fit(){
   makeCombo("sDeptCombo",  DEPARTMENTS,  DEPT_ALIASES, render);
   makeCombo("tDeptCombo",  DEPARTMENTS,  DEPT_ALIASES, render);
   makeCombo("tDesigCombo", DESIGNATIONS, null,         render);
+  makeCombo("tNameCombo",  TEACHER_ITEMS, null, render, function(it){
+    /* picking a teacher fills the two fields underneath it */
+    $("tDesig").value = it.t.desig;
+    $("tDept").value  = it.t.dept;
+  });
 
   if(!load()){
-    /* first visit — start from the template's own sample values */
-    $("sName").value    = "";
-    $("sId").value      = "";
-    $("sDept").value    = "Department of Computer Science and Engineering";
-    $("wType").value    = "Assignment";
-    $("wNo").value      = "";
-    $("wName").value    = "";
-    $("wCourse").value  = "";
-    $("tName").value    = "";
-    $("tDesig").value   = "Lecturer";
-    $("tDept").value    = "Department of Computer Science and Engineering";
+    /* first visit — everything blank, placeholders show the shape of each field */
+    $("sDept").value  = "Department of Computer Science and Engineering";
+    $("tDept").value  = "Department of Computer Science and Engineering";
+    $("tDesig").value = "Lecturer";
     var t = new Date();
     $("wDate").value = t.getFullYear() + "-" +
       String(t.getMonth()+1).padStart(2,"0") + "-" +
@@ -702,6 +1225,12 @@ function fit(){
     render();
   });
 
+  $("tabbar").addEventListener("click", function(e){
+    var b = e.target.closest("button[data-view]");
+    if(b) setView(b.dataset.view);
+  });
+
+  $("btnDownload").addEventListener("click", downloadPDF);
   $("btnPrint").addEventListener("click", function(){ window.print(); });
   $("btnFit").addEventListener("click", fit);
   $("btnReset").addEventListener("click", function(){
@@ -711,7 +1240,8 @@ function fit(){
     render();
   });
 
-  window.addEventListener("resize", fit);
+  window.addEventListener("resize", syncView);
+  setView(window.matchMedia("(max-width:900px)").matches ? "form" : "both");
   render();
   fit();
 })();
